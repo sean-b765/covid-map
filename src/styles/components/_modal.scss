@@ -1,0 +1,56 @@
+.modal {
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(255, 255, 255, 0.856);
+	left: 0;
+	top: 0;
+	padding: 3rem 1rem 5rem 1rem;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+
+	.btn {
+		position: absolute;
+		top: 0;
+		left: 0;
+		font-size: 1.76rem;
+	}
+
+	header {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+
+		.stats {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+		}
+	}
+
+	.charts {
+		position: relative;
+		width: 100%;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: flex-start;
+		overflow-y: auto;
+
+		> div {
+			min-height: 400px;
+			max-width: 500px;
+		}
+	}
+
+	@media screen and (max-width: 50rem) {
+		.charts {
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+	}
+}
