@@ -62,18 +62,20 @@ export type History = {
 	biweekly_deaths: string
 }
 
+export type Province = {
+	county: string
+	zip: string
+	state: string
+	lat: string
+	lng: string
+	cumulative: string
+	deaths: string
+	recovered: string
+}
+
 export type Location = {
 	location: string
-	provinces: Array<{
-		county: string
-		zip: string
-		state: string
-		lat: string
-		lng: string
-		cumulative: string
-		deaths: string
-		recovered: string
-	}>
+	provinces: Array<Province>
 	lat: string
 	lng: string
 	cumulative: string
@@ -81,4 +83,5 @@ export type Location = {
 	recovered: string
 	_id?: string
 	__v?: number
+	[key: string]: any
 }
