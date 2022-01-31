@@ -16,6 +16,11 @@
           flex-direction: column;
 }
 
+.modal select {
+  width: 100px;
+  margin: 1rem auto 2rem auto;
+}
+
 .modal .btn {
   position: absolute;
   top: 0;
@@ -79,10 +84,6 @@
 
 @media screen and (max-width: 50rem) {
   .modal .charts {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
     -webkit-box-pack: center;
         -ms-flex-pack: center;
             justify-content: center;
