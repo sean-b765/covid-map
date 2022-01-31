@@ -1,16 +1,29 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import ReactMapGl, { MapEvent, Layer, Source } from 'react-map-gl'
+import { useDispatch } from 'react-redux'
 import { useAppSelector } from '../app/hooks'
 import { Country, Province } from '../interfaces'
+import { open, setSelectedCountry } from '../slices/modalSlice'
 
 const Map = ({
 	countryCodes,
 	max,
+	maxProvince,
 }: {
 	countryCodes?: Country[]
 	max?: number
+	maxProvince?: number
 }) => {
+	const dispatch = useDispatch()
+
+	const { selectedCountry } = useAppSelector((state) => state.modal)
+	const { data, pending } = useAppSelector((state) => state.data)
+
+	useEffect(() => {
+		console.log(selectedCountry)
+	}, [selectedCountry])
+
 	const [viewport, setViewport] = useState({
 		width: '100vw',
 		height: '100vh',
@@ -20,6 +33,7 @@ const Map = ({
 	})
 	const [box, setBox] = useState({ width: 0, height: 0 })
 	const [xy, setXy] = useState({ x: 0, y: 0, active: false })
+
 	const [countries, setCountries] = useState<any>({
 		type: 'FeatureCollection',
 		features: [],
@@ -38,8 +52,6 @@ const Map = ({
 
 	const mapRef = useRef()
 
-	const { data, pending } = useAppSelector((state) => state.data)
-
 	const handleWindowResize = () =>
 		setBox({ width: window.innerWidth, height: window.innerHeight })
 
@@ -47,7 +59,7 @@ const Map = ({
 		setBox({ width: window.innerWidth, height: window.innerHeight })
 		window.addEventListener('resize', handleWindowResize)
 
-		data.map((item, id) => {
+		data.forEach((item, id) => {
 			setCountries((state) => {
 				return {
 					...state,
@@ -103,41 +115,52 @@ const Map = ({
 		return () => window.removeEventListener('resize', handleWindowResize)
 	}, [])
 
+	const setCountry = (location: string) => {
+		setXy({ ...xy, active: false })
+		dispatch(
+			setSelectedCountry(data.filter((datum) => datum.location === location)[0])
+		)
+		dispatch(open())
+	}
+
 	return (
 		<div className="map">
-			{xy.active && (
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					exit={{ opacity: 0 }}
-					className="popup"
-					style={{
-						zIndex: 999999999,
-						left: `${xy.x + 10}px`,
-						top: `${xy.y + 3}px`,
-						// Transform the popup if it's too close to edges
-						transform: `translate(${xy.x > box.width * 0.85 ? -120 : 0}%, ${
-							xy.y > box.height * 0.7 ? -120 : 0
-						}%)`,
-						position: 'fixed',
-						background: 'white',
-						padding: '1rem',
-						borderRadius: '0.5rem',
-					}}
-				>
-					{hoverItem.state ? (
-						<p style={{ whiteSpace: 'nowrap' }}>
-							{hoverItem.state}, {hoverItem.location}
-						</p>
-					) : (
-						<p style={{ whiteSpace: 'nowrap' }}>{hoverItem.location}</p>
-					)}
+			<AnimatePresence exitBeforeEnter>
+				{xy.active && !selectedCountry && (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						className="popup"
+						style={{
+							zIndex: 999999999,
+							left: `${xy.x + 10}px`,
+							top: `${xy.y + 3}px`,
+							// Transform the popup if it's too close to edges
+							transform: `translate(${xy.x > box.width * 0.7 ? -120 : 0}%, ${
+								xy.y > box.height * 0.7 ? -120 : 0
+							}%)`,
+							position: 'fixed',
+							background: 'white',
+							padding: '1rem',
+							borderRadius: '0.5rem',
+							borderTopLeftRadius: 0,
+						}}
+					>
+						{hoverItem.state ? (
+							<p style={{ whiteSpace: 'nowrap' }}>
+								{hoverItem.state}, {hoverItem.location}
+							</p>
+						) : (
+							<p style={{ whiteSpace: 'nowrap' }}>{hoverItem.location}</p>
+						)}
 
-					{hoverItem.city && <p>{hoverItem.city}</p>}
-					<p>{Number(hoverItem.cumulative).toLocaleString()} cases</p>
-					<p>{Number(hoverItem.deaths).toLocaleString()} deaths</p>
-				</motion.div>
-			)}
+						{hoverItem.city && <p>{hoverItem.city}</p>}
+						<p>{Number(hoverItem.cumulative).toLocaleString()} cases</p>
+						<p>{Number(hoverItem.deaths).toLocaleString()} deaths</p>
+					</motion.div>
+				)}
+			</AnimatePresence>
 			<ReactMapGl
 				mapOptions={{ trackResize: true }}
 				onMouseMove={(e) => {
@@ -147,7 +170,10 @@ const Map = ({
 				{...viewport}
 				maxZoom={8}
 				onClick={(e: MapEvent) => {
-					// console.log(e)
+					if (!e?.features[0]?.properties?.location) return
+					const properties = e?.features[0]?.properties
+
+					properties.location && setCountry(properties.location)
 				}}
 				onHover={(e) => {
 					if (!e?.features[0]?.properties?.cumulative) {
@@ -179,7 +205,7 @@ const Map = ({
 					paint={{
 						'circle-color': '#f85a5a',
 						'circle-stroke-color': '#f85a5a',
-						'circle-radius': 5,
+						'circle-radius': 4,
 						'circle-opacity': 0.3,
 						'circle-stroke-width': 1,
 						'circle-stroke-opacity': 1,
@@ -198,7 +224,7 @@ const Map = ({
 						'circle-opacity': 0.2,
 						'circle-stroke-opacity': 1,
 					}}
-					maxzoom={4}
+					maxzoom={4.5}
 				></Layer>
 			</ReactMapGl>
 		</div>

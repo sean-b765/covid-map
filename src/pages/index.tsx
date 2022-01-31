@@ -10,7 +10,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { getCurrentData } from '../slices/data'
 
 const IndexPage: NextPage<{}> = ({}) => {
-	const modalOpen = useAppSelector((state) => state.modal.open)
+	const [maxProvince, setMaxProvince] = useState(0)
+
+	const country = useAppSelector((state) => state.modal.selectedCountry)
 	const dispatch = useAppDispatch()
 
 	const { data, pending } = useAppSelector((state) => state.data)
@@ -32,6 +34,12 @@ const IndexPage: NextPage<{}> = ({}) => {
 		entries.push({ ...country[0], ...value })
 
 		if (parseInt(value.cumulative) > max) max = parseInt(value.cumulative)
+
+		// Get max province cumulative
+		value.provinces.map((province) => {
+			if (Number(province.cumulative) > maxProvince)
+				setMaxProvince(Number(province.cumulative))
+		})
 	})
 
 	return (
@@ -63,71 +71,82 @@ const IndexPage: NextPage<{}> = ({}) => {
 							animate={{ opacity: 1 }}
 							transition={{ duration: 0.5, delay: 0.3 }}
 						>
-							<Map max={max} />
+							<Map maxProvince={maxProvince} max={max} />
 						</motion.div>
 					) : (
-						<motion.svg
-							initial={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							transition={{ duration: 0.5 }}
-							className="spinner"
-							width="80"
-							height="80"
-							viewBox="0 0 44 44"
-							xmlns="http://www.w3.org/2000/svg"
-							stroke="#2c3bc4"
-						>
-							<g fill="none" fill-rule="evenodd" stroke-width="2">
-								<circle cx="22" cy="22" r="1">
-									<animate
-										attributeName="r"
-										begin="0s"
-										dur="1.8s"
-										values="1; 20"
-										calcMode="spline"
-										keyTimes="0; 1"
-										keySplines="0.165, 0.84, 0.44, 1"
-										repeatCount="indefinite"
-									/>
-									<animate
-										attributeName="stroke-opacity"
-										begin="0s"
-										dur="1.8s"
-										values="1; 0"
-										calcMode="spline"
-										keyTimes="0; 1"
-										keySplines="0.3, 0.61, 0.355, 1"
-										repeatCount="indefinite"
-									/>
-								</circle>
-								<circle cx="22" cy="22" r="1">
-									<animate
-										attributeName="r"
-										begin="-0.9s"
-										dur="1.8s"
-										values="1; 20"
-										calcMode="spline"
-										keyTimes="0; 1"
-										keySplines="0.165, 0.84, 0.44, 1"
-										repeatCount="indefinite"
-									/>
-									<animate
-										attributeName="stroke-opacity"
-										begin="-0.9s"
-										dur="1.8s"
-										values="1; 0"
-										calcMode="spline"
-										keyTimes="0; 1"
-										keySplines="0.3, 0.61, 0.355, 1"
-										repeatCount="indefinite"
-									/>
-								</circle>
-							</g>
-						</motion.svg>
+						<div className="loader">
+							<motion.h1
+								className="loading-text"
+								initial={{ opacity: 0 }}
+								exit={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ duration: 0.5 }}
+							>
+								Loading worldwide data...
+							</motion.h1>
+							<motion.svg
+								initial={{ opacity: 1 }}
+								exit={{ opacity: 0 }}
+								animate={{ opacity: 1 }}
+								transition={{ duration: 0.5 }}
+								className="spinner"
+								width="80"
+								height="80"
+								viewBox="0 0 44 44"
+								xmlns="http://www.w3.org/2000/svg"
+								stroke="#2c3bc4"
+							>
+								<g fill="none" fillRule="evenodd" strokeWidth="2">
+									<circle cx="22" cy="22" r="1">
+										<animate
+											attributeName="r"
+											begin="0s"
+											dur="1.8s"
+											values="1; 20"
+											calcMode="spline"
+											keyTimes="0; 1"
+											keySplines="0.165, 0.84, 0.44, 1"
+											repeatCount="indefinite"
+										/>
+										<animate
+											attributeName="stroke-opacity"
+											begin="0s"
+											dur="1.8s"
+											values="1; 0"
+											calcMode="spline"
+											keyTimes="0; 1"
+											keySplines="0.3, 0.61, 0.355, 1"
+											repeatCount="indefinite"
+										/>
+									</circle>
+									<circle cx="22" cy="22" r="1">
+										<animate
+											attributeName="r"
+											begin="-0.9s"
+											dur="1.8s"
+											values="1; 20"
+											calcMode="spline"
+											keyTimes="0; 1"
+											keySplines="0.165, 0.84, 0.44, 1"
+											repeatCount="indefinite"
+										/>
+										<animate
+											attributeName="stroke-opacity"
+											begin="-0.9s"
+											dur="1.8s"
+											values="1; 0"
+											calcMode="spline"
+											keyTimes="0; 1"
+											keySplines="0.3, 0.61, 0.355, 1"
+											repeatCount="indefinite"
+										/>
+									</circle>
+								</g>
+							</motion.svg>
+						</div>
 					)}
 				</AnimatePresence>
-				<AnimatePresence>{modalOpen && <Modal />}</AnimatePresence>
+				<AnimatePresence>{country && <Modal />}</AnimatePresence>
 			</main>
 		</>
 	)

@@ -3,13 +3,18 @@
  */
 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { CountryStatistic, DBRecord, History } from '../interfaces/index'
+import {
+	CountryStatistic,
+	DBRecord,
+	History,
+	Location,
+} from '../interfaces/index'
 import moment from 'moment'
 
 export interface InitialModalState {
 	open: boolean
 	pending: boolean
-	selectedCountry: CountryStatistic
+	selectedCountry: Location
 	historicalList: { [key: string]: Array<History> }
 }
 
@@ -41,12 +46,10 @@ export const modalSlice = createSlice({
 		},
 		close: (state) => {
 			state.open = false
+			state.selectedCountry = null
 		},
-		setSelectedCountry: (state, action: PayloadAction<CountryStatistic>) => {
+		setSelectedCountry: (state, action: PayloadAction<Location>) => {
 			state.selectedCountry = action.payload
-		},
-		setHistoricalData: (state, action: PayloadAction<any>) => {
-			console.log(action.payload.length)
 		},
 		addToHistoricalData: (state, action: PayloadAction<DBRecord[]>) => {},
 	},
@@ -75,12 +78,7 @@ export const modalSlice = createSlice({
 	},
 })
 
-export const {
-	open,
-	close,
-	setSelectedCountry,
-	setHistoricalData,
-	addToHistoricalData,
-} = modalSlice.actions
+export const { open, close, setSelectedCountry, addToHistoricalData } =
+	modalSlice.actions
 
 export default modalSlice.reducer
