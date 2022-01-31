@@ -31,8 +31,10 @@ const Chart = ({ selectedLocation }) => {
 				  }
 				: { ...datum, xAxis: moment(datum.date).format('D MMM YY') }
 		})
-		.filter((datum) =>
-			moment(datum.date).isAfter(moment().subtract(time, 'months'))
+		.filter(
+			(datum) =>
+				moment(datum.date).isAfter(moment().subtract(time, 'months')) &&
+				Number(datum.new_cases) > 0
 		)
 
 	const pending = useAppSelector((state) => state.modal.pending)
