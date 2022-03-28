@@ -3,13 +3,7 @@
  */
 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import {
-	CountryStatistic,
-	DBRecord,
-	History,
-	Location,
-} from '../interfaces/index'
-import moment from 'moment'
+import { Location } from '../interfaces/index'
 
 export interface InitialDataState {
 	pending: boolean

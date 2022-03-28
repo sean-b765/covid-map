@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import moment from 'moment'
 import React, { useState } from 'react'
+import { useEffect } from 'react'
 import {
 	AreaChart,
 	Area,
@@ -14,6 +15,8 @@ import { useAppSelector } from '../app/hooks'
 
 const Chart = ({ selectedLocation }) => {
 	const [time, setTime] = useState(999)
+	const [data, setData] = useState([])
+
 	const _data = useAppSelector(
 		(state) => state.modal.historicalList[selectedLocation]
 	)
@@ -21,21 +24,27 @@ const Chart = ({ selectedLocation }) => {
 	const max = useAppSelector((state) => state.modal.selectedCountry.cases)
 	const leftMargin = Number(max) >= 10_000_000 ? 40 : 20
 
-	const data = _data
-		?.map((datum) => {
-			return Number(datum.new_cases) < 0
-				? {
-						...datum,
-						xAxis: moment(datum.date).format('D MMM YY'),
-						new_cases: '0',
-				  }
-				: { ...datum, xAxis: moment(datum.date).format('D MMM YY') }
-		})
-		.filter(
-			(datum) =>
-				moment(datum.date).isAfter(moment().subtract(time, 'months')) &&
-				Number(datum.new_cases) > 0
+	useEffect(() => {
+		console.log(_data)
+
+		setData(
+			_data
+				?.map((datum) => {
+					return Number(datum.new_cases) < 0
+						? {
+								...datum,
+								xAxis: moment(datum.date).format('D MMM YY'),
+								new_cases: '0',
+						  }
+						: { ...datum, xAxis: moment(datum.date).format('D MMM YY') }
+				})
+				.filter(
+					(datum) =>
+						moment(datum.date).isAfter(moment().subtract(time, 'months')) &&
+						Number(datum.new_cases) > 0
+				)
 		)
+	}, [time, _data, setData])
 
 	const pending = useAppSelector((state) => state.modal.pending)
 
@@ -108,13 +117,17 @@ const Chart = ({ selectedLocation }) => {
 		</div>
 	) : data?.length ? (
 		<>
-			<select>
-				<option onClick={() => setTime(999)}>All time</option>
-				<option onClick={() => setTime(24)}>2 years</option>
-				<option onClick={() => setTime(12)}>1 year</option>
-				<option onClick={() => setTime(6)}>6 months</option>
-				<option onClick={() => setTime(3)}>3 months</option>
-				<option onClick={() => setTime(1)}>1 month</option>
+			<select
+				onChange={(e) => {
+					setTime(Number(e.target.value) || 999)
+				}}
+			>
+				<option value={999}>All time</option>
+				<option value={24}>2 years</option>
+				<option value={12}>1 year</option>
+				<option value={6}>6 months</option>
+				<option value={3}>3 months</option>
+				<option value={1}>1 month</option>
 			</select>
 			<motion.div
 				initial={{ opacity: 0 }}

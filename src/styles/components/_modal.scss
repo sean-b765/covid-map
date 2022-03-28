@@ -1,14 +1,16 @@
 .modal {
-	position: fixed;
+	position: absolute;
 	width: 100vw;
-	height: 100vh;
-	background: rgba(255, 255, 255, 0.856);
+	min-height: 100vh;
+	background: rgba(255, 255, 255, 0.945);
 	left: 0;
 	top: 0;
 	padding: 3rem 1rem 5rem 1rem;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
+	z-index: 100000;
 
 	select {
 		width: 100px;
@@ -16,10 +18,11 @@
 	}
 
 	.btn {
-		position: absolute;
+		position: fixed;
 		top: 0;
 		left: 0;
 		font-size: 1.76rem;
+		z-index: 90;
 	}
 
 	header {
@@ -43,7 +46,6 @@
 		flex-wrap: wrap;
 		justify-content: center;
 		align-items: flex-start;
-		overflow-y: auto;
 
 		> div {
 			min-height: 400px;

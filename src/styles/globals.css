@@ -1,12 +1,13 @@
 .modal {
-  position: fixed;
+  position: absolute;
   width: 100vw;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.856);
+  min-height: 100vh;
+  background: rgba(255, 255, 255, 0.945);
   left: 0;
   top: 0;
   padding: 3rem 1rem 5rem 1rem;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -14,6 +15,7 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
+  z-index: 100000;
 }
 
 .modal select {
@@ -22,10 +24,11 @@
 }
 
 .modal .btn {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   font-size: 1.76rem;
+  z-index: 90;
 }
 
 .modal header {
@@ -74,7 +77,6 @@
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
-  overflow-y: auto;
 }
 
 .modal .charts > div {
